@@ -20,15 +20,37 @@ repositories {
 }
 
 dependencies {
+	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Jackson Kotlin Module
 	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+
+	// Kotlin Reflect
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+
+	// Spring Boot DevTools (опционально для разработки)
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// PostgreSQL Driver
 	runtimeOnly 'org.postgresql:postgresql'
+
+	// JWT Dependencies
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Для сериализации JSON
+
+	// Spring Boot Starter Mail (для будущей интеграции с E-mail/SMS)
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// Test Dependencies
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 	testImplementation 'org.springframework.security:spring-security-test'

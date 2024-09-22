@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: auth_db_user
+    password: change-me
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  redis:
+    host: localhost
+    port: 6379
+  mail:
+    host: localhost
+    port: 1025
+    username: # ???????? ?????? ??? MailHog
+    password: # ???????? ?????? ??? MailHog
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+jwt:
+  secret: YourJWTSecretKeyHereChangeIt
+  access-token-expiration: 3600000 # 1 ??? ? ?????????????
+  refresh-token-expiration: 86400000 # 24 ???? ? ?????????????
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+server:
+  port: 8080
