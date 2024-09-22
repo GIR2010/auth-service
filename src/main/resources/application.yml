@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/authdb
-    username: auth_db_user
-    password: change-me
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/authdb}
+    username: ${DB_USERNAME:auth_db_user}
+    password: ${DB_PASSWORD:change-me}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -11,13 +11,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   redis:
-    host: localhost
-    port: 6379
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
   mail:
-    host: localhost
-    port: 1025
-    username: # ???????? ?????? ??? MailHog
-    password: # ???????? ?????? ??? MailHog
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -26,9 +26,9 @@ spring:
             enable: false
 
 jwt:
-  secret: YourJWTSecretKeyHereChangeIt
-  access-token-expiration: 3600000 # 1 ??? ? ?????????????
-  refresh-token-expiration: 86400000 # 24 ???? ? ?????????????
+  secret: ${JWT_SECRET:YourJWTSecretKeyHereChangeIt}
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION_MS:3600000} # 1 ??? ? ?????????????
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION_MS:86400000} # 24 ???? ? ?????????????
 
 management:
   endpoints:
@@ -37,4 +37,4 @@ management:
         include: health,info
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
