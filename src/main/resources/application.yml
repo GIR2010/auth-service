@@ -5,11 +5,16 @@ spring:
     password: ${DB_PASSWORD:change-me}
     driver-class-name: org.postgresql.Driver
   jpa:
+    show-sql: true
     hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: none
+    open-in-view: off
+  logging:
+    level:
+      org.springframework.security: TRACE
+      org.springframework.security.authentication: TRACE
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}

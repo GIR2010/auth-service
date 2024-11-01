@@ -1,61 +1,61 @@
 package ru.waiterix.auth.config
 
-import ru.waiterix.auth.security.JwtTokenFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.provisioning.InMemoryUserDetailsManager
+import ru.waiterix.auth.security.JwtTokenFilter
+import ru.waiterix.auth.service.UserService
 
 @Configuration
-class SecurityConfig(private val jwtTokenFilter: JwtTokenFilter) {
-
+class SecurityConfig(
+    private val jwtTokenFilter: JwtTokenFilter,
+    private val userDetailsService: UserDetailsService,
+    private val passwordEncoder: PasswordEncoder,
+    private val userService: UserService,
+) {
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .csrf().disable()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Отключаем сессии
-            .and()
-            .authorizeHttpRequests { authz ->
-                authz
-                    .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/test-mail").permitAll()
-                    .requestMatchers("/login").permitAll()
-                    .anyRequest().authenticated()
-            }
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .httpBasic().disable()
-            .formLogin().disable()
-
-        return http.build()
+    fun authenticationProvider(): DaoAuthenticationProvider {
+        val authProvider = DaoAuthenticationProvider()
+        authProvider.setUserDetailsService(userDetailsService)
+        authProvider.setPasswordEncoder(passwordEncoder)
+        return authProvider
     }
-
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
         return authenticationConfiguration.authenticationManager
     }
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .csrf { csrf -> csrf.disable() } // Отключаем CSRF для REST-приложений
+            .sessionManagement { session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS) } // Настраиваем управление сессиями как "stateless"
+            .authorizeHttpRequests { requests ->
+                requests
+                    .requestMatchers("/login", "/register", "/actuator", "/hello").permitAll()
+                    .anyRequest().authenticated()
+            }
+
+            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
+
+        return http.build()
     }
 
     @Bean
-    fun userDetailsService(passwordEncoder: PasswordEncoder): UserDetailsService {
-        val user = User.builder()
-            .username("user")
-            .password(passwordEncoder.encode("password"))
-            .roles("USER")
-            .build()
-        return InMemoryUserDetailsManager(user)
+    fun userDetailsService(): UserDetailsService {
+        return UserDetailsService { username ->
+            userService.findByUsername(username).orElseThrow {
+                UsernameNotFoundException("User not found with username: $username")
+            }
+        }
     }
 }
